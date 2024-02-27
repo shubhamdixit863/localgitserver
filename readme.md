@@ -80,7 +80,7 @@ None specified.
 
 ## Find Us
 
-- [GitHub](https://github.com/yourgithub)
+- [GitHub](https://github.com/shubhamdixit863)
 
 ## Contributing
 
@@ -88,7 +88,7 @@ Please read [CONTRIBUTING.md](http://example.com) for details on our code of con
 
 ## Authors
 
-- **Your Name** - *Initial work* - [YourName](https://github.com/YourName)
+- **Shubham Dixit** - *Initial work* - [Shubhamd  dixit](https://github.com/shubhamdixit863)
 
 See also the list of [contributors](https://github.com/yourproject/contributors) who participated in this project.
 
@@ -96,11 +96,5 @@ See also the list of [contributors](https://github.com/yourproject/contributors)
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
 
-## Acknowledgments
 
-- Hat tip to anyone whose code was used
-- Inspiration
-- etc
-
----
 
