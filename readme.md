@@ -82,15 +82,12 @@ None specified.
 
 - [GitHub](https://github.com/shubhamdixit863)
 
-## Contributing
-
-Please read [CONTRIBUTING.md](http://example.com) for details on our code of conduct, and the process for submitting pull requests to us.
 
 ## Authors
 
 - **Shubham Dixit** - *Initial work* - [Shubhamd  dixit](https://github.com/shubhamdixit863)
 
-See also the list of [contributors](https://github.com/yourproject/contributors) who participated in this project.
+
 
 ## License
 
