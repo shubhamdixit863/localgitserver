@@ -1,5 +1,3 @@
-
-
 # Docker Image for SSH and Apache2 with Git
 
 This Docker image is based on Ubuntu latest version and includes Apache2, Git, and SSH server setup for general web and Git repository serving purposes.
@@ -43,16 +41,23 @@ For multiarch build
 ```bash
 sudo docker buildx build  --no-cache --platform linux/amd64,linux/arm64 -t shubhamdixit863/gitserverapache:latest --push .
 
-````
+```
 
 ### Usage
 
 #### Container Parameters
 
-Run the container with the following command:
+Run the container with the following command,changethe the volume path if and when required
 
 ```bash
-docker run -d -p 22:22 -p 80:80 -p 443:443 yourusername/yourimagename:tag
+sudo docker build -t localgitserver .
+
+docker run -d \
+  -v "$(pwd)/authorized_keys":/root/.ssh/authorized_keys \
+  -v "$(pwd)/.htpasswd":/auth/.htpasswd \
+  -p 2222:22 -p 8080:80 -p 8443:443 \
+  --name localgitserver \
+  localgitserver
 ```
 
 This will start the container with SSH, HTTP, and HTTPS access. You can access the services provided by the container by connecting to the ports mapped on your host.
@@ -78,20 +83,18 @@ None specified.
 - OpenSSH Server
 - Git
 
+## To Geneerate new apache username password
+
+`htpasswd -c .htpasswd root`
+
 ## Find Us
 
 - [GitHub](https://github.com/shubhamdixit863)
 
-
 ## Authors
 
-- **Shubham Dixit** - *Initial work* - [Shubhamd  dixit](https://github.com/shubhamdixit863)
-
-
+- **Shubham Dixit** - _Initial work_ - [Shubhamd dixit](https://github.com/shubhamdixit863)
 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
-
-
-

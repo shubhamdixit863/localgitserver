@@ -15,14 +15,18 @@ RUN sed -ri 's/^#?PermitRootLogin\s+.*/PermitRootLogin yes/' /etc/ssh/sshd_confi
 RUN sed -ri 's/^#?ChallengeResponseAuthentication\s+.*/ChallengeResponseAuthentication no/' /etc/ssh/sshd_config
 
 # Add  SSH public key to root's authorized keys
-RUN mkdir /root/.ssh && \
-    echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEHAtto0bVGTAUATJhiDTjKa/lZg1LYu+gdJcyn4cK8D local" > /root/.ssh/authorized_keys && \
+RUN mkdir -p /root/.ssh && \
+    chmod 700 /root/.ssh && \
+    touch /root/.ssh/authorized_keys && \
     chmod 600 /root/.ssh/authorized_keys
 
 # Enable Apache SSL and CGI modules
+# Enable Apache SSL and CGI modules
 RUN a2enmod ssl && \
     a2enmod cgi && \
-    a2ensite default-ssl  # Enable the default SSL site configuration
+    a2enmod auth_basic && \
+    a2enmod authn_file && \
+    a2ensite default-ssl
 
 # Set up Apache to serve the Git repository
 RUN mkdir /var/www/git && \
@@ -33,40 +37,36 @@ RUN mkdir /var/www/git && \
 RUN mkdir /auth && \
     htpasswd -cb /auth/.htpasswd root root && \
     echo "<VirtualHost *:80>\n\
-        SetEnv GIT_PROJECT_ROOT /var/www/git\n\
-        SetEnv GIT_HTTP_EXPORT_ALL\n\
-        ScriptAlias /git/ /usr/lib/git-core/git-http-backend/\n\
-        <Directory \"/usr/lib/git-core\">\n\
-            Options +ExecCGI -MultiViews +SymLinksIfOwnerMatch\n\
-            Require all granted\n\
-        </Directory>\n\
-        <Directory /var/www/git>\n\
-            Options +ExecCGI -MultiViews +SymLinksIfOwnerMatch\n\
-            AuthType Basic\n\
-            AuthName \"Git Access\"\n\
-            AuthUserFile /auth/.htpasswd\n\
-            Require valid-user\n\
-        </Directory>\n\
-        </VirtualHost>\n\
-        <VirtualHost *:443>\n\
-        SSLEngine on\n\
-        SSLCertificateFile /etc/ssl/certs/ssl-cert-snakeoil.pem\n\
-        SSLCertificateKeyFile /etc/ssl/private/ssl-cert-snakeoil.key\n\
-        SetEnv GIT_PROJECT_ROOT /var/www/git\n\
-        SetEnv GIT_HTTP_EXPORT_ALL\n\
-        ScriptAlias /git/ /usr/lib/git-core/git-http-backend/\n\
-        <Directory \"/usr/lib/git-core\">\n\
-            Options +ExecCGI -MultiViews +SymLinksIfOwnerMatch\n\
-            Require all granted\n\
-        </Directory>\n\
-        <Directory /var/www/git>\n\
-            Options +ExecCGI -MultiViews +SymLinksIfOwnerMatch\n\
-            AuthType Basic\n\
-            AuthName \"Git Access\"\n\
-            AuthUserFile /auth/.htpasswd\n\
-            Require valid-user\n\
-        </Directory>\n\
-        </VirtualHost>" > /etc/apache2/sites-available/000-default.conf
+    SetEnv GIT_PROJECT_ROOT /var/www/git\n\
+    SetEnv GIT_HTTP_EXPORT_ALL\n\
+    ScriptAlias /git/ /usr/lib/git-core/git-http-backend/\n\
+    <Location /git>\n\
+    AuthType Basic\n\
+    AuthName \"Git Access\"\n\
+    AuthUserFile /auth/.htpasswd\n\
+    Require valid-user\n\
+    </Location>\n\
+    </VirtualHost>\n\
+    <VirtualHost *:443>\n\
+    SSLEngine on\n\
+    SSLCertificateFile /etc/ssl/certs/ssl-cert-snakeoil.pem\n\
+    SSLCertificateKeyFile /etc/ssl/private/ssl-cert-snakeoil.key\n\
+    SetEnv GIT_PROJECT_ROOT /var/www/git\n\
+    SetEnv GIT_HTTP_EXPORT_ALL\n\
+    ScriptAlias /git/ /usr/lib/git-core/git-http-backend/\n\
+    <Location /git>\n\
+    AuthType Basic\n\
+    AuthName \"Git Access\"\n\
+    AuthUserFile /auth/.htpasswd\n\
+    Require valid-user\n\
+    </Location>\n\
+    </VirtualHost>" > /etc/apache2/sites-available/000-default.conf
+
+
+# Enable the site and ensure the Apache user can read the .htpasswd file
+RUN a2ensite 000-default && \
+    chmod 644 /auth/.htpasswd && \
+    chown www-data:www-data /auth/.htpasswd
 
 # Expose port 22 for SSH access, 80 for HTTP access, and 443 for HTTPS access
 EXPOSE 22 80 443
@@ -89,6 +89,3 @@ RUN chmod +x /start.sh
 
 # Command to run the startup script
 CMD ["/start.sh"]
-
-
-
