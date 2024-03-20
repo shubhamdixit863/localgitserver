@@ -1,5 +1,7 @@
 FROM ubuntu:latest
 
+ARG REPO_COUNT=1
+
 
 RUN apt-get update && \
     apt-get install -y git openssh-server apache2 apache2-utils ssl-cert && \
@@ -21,7 +23,6 @@ RUN mkdir -p /root/.ssh && \
     chmod 600 /root/.ssh/authorized_keys
 
 # Enable Apache SSL and CGI modules
-# Enable Apache SSL and CGI modules
 RUN a2enmod ssl && \
     a2enmod cgi && \
     a2enmod auth_basic && \
@@ -29,9 +30,12 @@ RUN a2enmod ssl && \
     a2ensite default-ssl
 
 # Set up Apache to serve the Git repository
-RUN mkdir /var/www/git && \
-    git init --bare /var/www/git/test.git && \
-    chown -R www-data:www-data /var/www/git
+# Create multiple repositories based on the REPO_COUNT argument
+RUN for i in $(seq 1 $REPO_COUNT); do \
+    mkdir -p "/var/www/git/repo$i.git" && \
+    git init --bare "/var/www/git/repo$i.git" && \
+    chown -R www-data:www-data "/var/www/git/repo$i.git"; \
+    done
 
 # Setup Apache for Git HTTP and HTTPS access with Basic authentication
 RUN mkdir /auth && \
@@ -71,16 +75,18 @@ RUN a2ensite 000-default && \
 # Expose port 22 for SSH access, 80 for HTTP access, and 443 for HTTPS access
 EXPOSE 22 80 443
 
-# Initialize repository and add files
-RUN mkdir /tmp/git-repo && \
-    cd /tmp/git-repo && \
+
+RUN for i in $(seq 1 $REPO_COUNT); do \
+    mkdir /tmp/git-repo$i && \
+    cd /tmp/git-repo$i && \
     git init && \
     git config --global user.email "you@example.com" && \
     git config --global user.name "Your Name" && \
     echo "some: data" > data.yaml && \
     git add data.yaml && \
     git commit -m "Initial commit" && \
-    git push /var/www/git/test.git master
+    git push /var/www/git/repo$i.git master;\
+    done
 
 
 # Copy the start script into the container and set permissions

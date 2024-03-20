@@ -6,7 +6,5 @@ touch /var/log/apache2/error.log
 service ssh start
 tail -F /var/log/apache2/* /var/log/auth.log &
 
-
-
 # Run Apache2 in the foreground is important
 apache2ctl -D FOREGROUND

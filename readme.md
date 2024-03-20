@@ -50,9 +50,9 @@ sudo docker buildx build  --no-cache --platform linux/amd64,linux/arm64 -t quay.
 Run the container with the following command,changethe the volume path if and when required
 
 ```bash
-sudo docker build -t localgitserver .
+sudo docker build --no-cache --build-arg REPO_COUNT=5   -t localgitserver .
 
-docker run -d \
+docker run 4 -d \
   -v "$(pwd)/authorized_keys":/root/.ssh/authorized_keys \
   -v "$(pwd)/.htpasswd":/auth/.htpasswd \
   -p 2222:22 -p 8080:80 -p 8443:443 \
