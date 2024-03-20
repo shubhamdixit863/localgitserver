@@ -39,7 +39,7 @@ docker build -t yourusername/yourimagename:tag .
 For multiarch build
 
 ```bash
-sudo docker buildx build  --no-cache --platform linux/amd64,linux/arm64 -t shubhamdixit863/gitserverapache:latest --push .
+sudo docker buildx build  --no-cache --platform linux/amd64,linux/arm64 -t quay.io/numaio/localgitserver:latest --push .
 
 ```
 
