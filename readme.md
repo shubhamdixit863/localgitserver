@@ -39,7 +39,7 @@ docker build -t yourusername/yourimagename:tag .
 For multiarch build
 
 ```bash
-sudo docker buildx build  --no-cache --platform linux/amd64,linux/arm64 -t quay.io/numaio/localgitserver:latest --push .
+sudo docker buildx build  --no-cache --build-arg REPO_COUNT=5 --platform linux/amd64,linux/arm64 -t quay.io/numaio/localgitserver:latest --push .
 
 ```
 
@@ -52,7 +52,7 @@ Run the container with the following command,changethe the volume path if and wh
 ```bash
 sudo docker build --no-cache --build-arg REPO_COUNT=5   -t localgitserver .
 
-docker run 4 -d \
+docker run  -d \
   -v "$(pwd)/authorized_keys":/root/.ssh/authorized_keys \
   -v "$(pwd)/.htpasswd":/auth/.htpasswd \
   -p 2222:22 -p 8080:80 -p 8443:443 \
